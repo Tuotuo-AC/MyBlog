@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -85,15 +88,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         # 数据库的名字
-        'NAME': 'MyBlog',
+        'NAME': os.getenv('DB_NAME'),
         # 数据库的地址
-        'HOST':'localhost',
+        'HOST':os.getenv('DB_HOST','localhost'),
         # 数据库的端口
-        'PORT':'3306',
+        'PORT':os.getenv('DB_PORT','3306'),
         # 用户名
-        "USER":"root",
+        "USER":os.getenv('DB_USER','root'),
         # 密码
-        "PASSWORD":"ttt121",
+        "PASSWORD":os.getenv("DB_PASSWORD"),
     }
 }
 
@@ -116,6 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'user.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
@@ -132,4 +136,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# 静态文件配置
 STATIC_URL = 'static/'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
+
+
+
