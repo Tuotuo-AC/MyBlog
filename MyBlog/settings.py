@@ -155,6 +155,15 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'full',
         'height': 400,
         'width': '100%',
+        'extraPlugins': 'codesnippet',   # 启用代码片段插件
+        'codeSnippet_languages': {
+            'python': 'Python',
+            'javascript': 'JavaScript',
+            'html': 'HTML',
+            'css': 'CSS',
+            'bash': 'Bash',
+            'sql': 'SQL',
+        },
     },
 }
 
