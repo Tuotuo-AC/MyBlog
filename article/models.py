@@ -85,9 +85,4 @@ class Post(models.Model):
     # 返回文章的详情页URL
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('article:detail', args=[
-            self.publish_time.year,
-            self.publish_time.month,
-            self.publish_time.day,
-            self.slug
-        ])
+        return reverse('article:detail', args=[self.slug])
