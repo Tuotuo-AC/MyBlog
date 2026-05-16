@@ -29,6 +29,9 @@ urlpatterns = [
 
 # 媒体文件服务（开发环境）
 if settings.DEBUG:
+    # 是开发环境下为了让 Django 提供用户上传文件访问的能力。
+    # 这行代码不是必须的，但如果你希望在上传图片后立即能在浏览器中看到，就需要它。
+    # 生产环境务必移除这行，改用 Web 服务器直接托管媒体文件。
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     # 如果你希望显式提供静态文件服务（通常不需要，Django 会自动处理），可以添加下面一行：
     # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -79,5 +79,49 @@ def search(request):
     return render(request, 'article/search.html', {'results': results, 'query': query})
 
 
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.text import slugify
+from django.utils import timezone
+from .forms import PostForm
+from .models import Post, Tag
+import time
+
+# 只有登录用户可访问
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        # ... 前面代码不变
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.status = 'published'
+            post.publish_time = timezone.now()
+            # 生成slug
+            base_slug = slugify(post.title)
+            if not base_slug:
+                base_slug = f"post-{int(time.time())}"
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            post.slug = slug
+
+            post.save()  # 先保存文章，才能设置多对多标签
+
+            # 处理标签
+            tags = form.cleaned_data.get('tags', [])
+            for tag_name in tags:
+                tag, _ = Tag.objects.get_or_create(name=tag_name, slug=slugify(tag_name))
+                post.tags.add(tag)
+
+            return redirect('article:detail', slug=post.slug)
+    else:
+        form = PostForm()
+    return render(request, 'article/create.html', {'form': form})
+
+
 
 
