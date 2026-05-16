@@ -16,13 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
+from user.views import register
 from django.conf import settings
 from django.conf.urls.static import static
-from user.views import register
+
 urlpatterns = [
        path('admin/', admin.site.urls),
        path('', include('article.urls')),
        path('accounts/', include('django.contrib.auth.urls')),
        path('accounts/register/', register, name='register'),
-       path('accounts/', include('django.contrib.auth.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# 媒体文件服务（开发环境）
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # 如果你希望显式提供静态文件服务（通常不需要，Django 会自动处理），可以添加下面一行：
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

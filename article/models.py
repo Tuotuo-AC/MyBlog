@@ -75,6 +75,8 @@ class Post(models.Model):
 
     # 统计
     views = models.PositiveIntegerField(default=0, verbose_name='阅读量')
+    # 添加图片字段
+    image = models.ImageField(upload_to='post_images/', blank=True, null=True, verbose_name='封面图')
 
     class Meta:
         ordering = ('-publish_time',)  # 按发布时间倒序
