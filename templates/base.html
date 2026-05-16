@@ -10,11 +10,17 @@
         .post-meta { color: #6c757d; font-size: 0.9rem; margin-bottom: 1rem; }
         .post-content img { max-width: 100%; height: auto; }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <div class="container">
-        <header class="pb-3 mb-4 border-bottom">
-            <h1><a href="{% url 'article:list' %}" class="text-dark text-decoration-none">我的博客</a></h1>
+         <!-- 头部：标题 + 搜索框 -->
+        <header class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-4 border-bottom">
+            <h1 class="h3 mb-0"><a href="{% url 'article:list' %}" class="text-dark text-decoration-none">我的博客</a></h1>
+            <form method="get" action="{% url 'article:search' %}" class="d-flex" role="search">
+                <input class="form-control me-2" type="search" name="q" placeholder="搜索文章..." aria-label="Search" size="20">
+                <button class="btn btn-outline-primary" type="submit">搜索</button>
+            </form>
         </header>
         <main>
             {% block content %}{% endblock %}
@@ -23,11 +29,13 @@
             &copy; 2025 我的博客
         </footer>
     </div>
+    {#    代码高亮   #}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => hljs.highlightAll());
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

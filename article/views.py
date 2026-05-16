@@ -3,6 +3,7 @@ from django.views.generic import ListView,DetailView
 from django.shortcuts import get_object_or_404 # 根据条件获取对象，找不到则自动返回 404 页面
 from .models import Post
 
+
 # 列表视图
 class PostListView(ListView):
     model = Post # 告诉ListView使用Post模型
@@ -64,7 +65,18 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         # 表单验证失败时重新渲染页面并显示错误
         return self.render_to_response(self.get_context_data(comment_form=form))
 
-
+from django.db.models import Q
+from django.shortcuts import render
+# 搜索视图
+def search(request):
+    query = request.GET.get('q')
+    results = []
+    if query:
+        results = Post.objects.filter(
+            Q(title__icontains=query) | Q(content__icontains=query),
+            status='published'
+        )
+    return render(request, 'article/search.html', {'results': results, 'query': query})
 
 
 
