@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-
+from ckeditor.fields import RichTextField
 User = get_user_model()
 
 class Category(models.Model):
@@ -63,7 +63,7 @@ class Post(models.Model):
 
     # 内容相关
     summary = models.CharField(max_length=300, blank=True, verbose_name='摘要', help_text='可留空由AI生成')
-    content = models.TextField(verbose_name='正文', help_text='支持Markdown格式')
+    content = RichTextField(verbose_name='正文', config_name='default')
 
     # 发布状态与时间
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft', verbose_name='状态')
@@ -85,4 +85,9 @@ class Post(models.Model):
     # 返回文章的详情页URL
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('article:detail', args=[self.slug])
+        return reverse('article:detail', args=[
+            self.publish_time.year,
+            self.publish_time.month,
+            self.publish_time.day,
+            self.slug
+        ])

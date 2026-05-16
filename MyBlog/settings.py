@@ -28,17 +28,21 @@ SECRET_KEY = 'django-insecure-)@^(6xn+6ey6p*f1g5b)1-#79zk0y$xvs)4rizt3$%g*e75z5v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.admin',       # Admin 后台
+    'django.contrib.auth',        # 认证系统
+    'django.contrib.contenttypes', # 内容类型框架
+    'django.contrib.sessions',    # Session 管理
+    'django.contrib.messages',    # 消息框架
+    'django.contrib.staticfiles', # 静态文件管理
+    # 第三方
+    'ckeditor',
+    # 自定义应用
     'article',
     'user',
     'comment',
@@ -59,7 +63,7 @@ ROOT_URLCONF = 'MyBlog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [BASE_DIR / 'static']
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -118,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+# 自定义用户模型
 AUTH_USER_MODEL = 'user.User'
 
 # Internationalization
@@ -126,7 +130,7 @@ AUTH_USER_MODEL = 'user.User'
 
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'Asia-Shanghai'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
@@ -140,8 +144,20 @@ USE_TZ = True
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# CKEditor 配置
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 400,
+        'width': '100%',
+    },
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
