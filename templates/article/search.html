@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}搜索 - 我的博客{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2>搜索文章</h2>
+        <form method="get" action="{% url 'article:search' %}" class="mb-4">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="输入关键词搜索标题或内容..." value="{{ query|default:'' }}">
+                <button class="btn btn-primary" type="submit">搜索</button>
+            </div>
+        </form>
+
+        {% if query %}
+            <h4>搜索结果：共 {{ results|length }} 条匹配 "{{ query }}"</h4>
+            <hr>
+            {% if results %}
+                {% for post in results %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ post.get_absolute_url }}" class="text-decoration-none">{{ post.title }}</a>
+                            </h5>
+                            <div class="post-meta">
+                                作者：{{ post.author.username }} | 
+                                分类：{{ post.category.name|default:"未分类" }} | 
+                                发布时间：{{ post.publish_time|date:"Y-m-d" }}
+                            </div>
+                            <p class="card-text">
+                                {{ post.summary|default:post.content|truncatechars:200|striptags }}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-warning">没有找到相关文章，请换一个关键词试试。</div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info">请输入关键词进行搜索。</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
