@@ -14,17 +14,19 @@ class PostListView(ListView):
     def get_queryset(self):
         return Post.objects.filter(status='published').select_related('author','category')
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+from comment.forms import CommentForm
+
 # 详情视图
-class PostDetailView(DetailView):
+class PostDetailView(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'article/detail.html'
     context_object_name = 'post'
+    login_url = '/accounts/login/' # 未登录时跳转的地址
 
     # DetailView 默认的 get_object() 方法只处理 pk 或 slug。我们要改成：从 self.kwargs 中取出 year, month, day, slug，然后用这些条件去数据库查询
     def get_object(self,queryset=None):
-        year = self.kwargs.get('year')
-        month = self.kwargs.get('month')
-        day = self.kwargs.get('day')
         slug = self.kwargs.get('slug')
         obj = get_object_or_404(
             Post,
@@ -36,10 +38,31 @@ class PostDetailView(DetailView):
         obj.save(update_fields=['views']) # 只更新这个字段
         return obj
 
+    # 将评论表单和顶级评论列表传递给模板供渲染
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['content_html'] = self.object.content  # ckeditor 输出已是 HTML
+        context['comment_form'] = CommentForm()
+        # 获取顶级评论（parent 为 None）
+        context['comments'] = self.object.comments.filter(parent=None)
         return context
+
+    # 处理表单提交:验证、保存评论、关联文章和当前用户，支持嵌套评论（通过parent_id)
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object
+            comment.author = request.user
+            # 如果有 parent_id 参数，说明是回复评论
+            parent_id = request.POST.get('parent_id')
+            if parent_id:
+                comment.parent_id = parent_id
+            comment.save()
+            return redirect(self.object.get_absolute_url())
+        # 表单验证失败时重新渲染页面并显示错误
+        return self.render_to_response(self.get_context_data(comment_form=form))
 
 
 

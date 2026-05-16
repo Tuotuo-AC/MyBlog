@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles', # 静态文件管理
     # 第三方
     'ckeditor',
+    'mptt',
     # 自定义应用
     'article',
     'user',
@@ -159,7 +160,8 @@ CKEDITOR_CONFIGS = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+LOGIN_REDIRECT_URL = '/'      # 登录后跳转到首页
+LOGOUT_REDIRECT_URL = '/'     # 登出后跳转到首页
 
 
 
