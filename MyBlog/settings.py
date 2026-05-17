@@ -26,9 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)@^(6xn+6ey6p*f1g5b)1-#79zk0y$xvs)4rizt3$%g*e75z5v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
+# ALLOWED_HOSTS = ['*']
+# 生产环境设置
 DEBUG = True
-
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'your_domain.com']   # 按需修改
 
 
 # Application definition
@@ -167,6 +169,18 @@ CKEDITOR_CONFIGS = {
         },
     },
 }
+
+# Redis 缓存配置（注意：Docker 中 REDIS_HOST 为服务名 'redis'）
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:{os.environ.get('REDIS_PORT', '6379')}/1",
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+}
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
