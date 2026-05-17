@@ -2,6 +2,12 @@
 
 {% block title %}{{ post.title }}{% endblock %}
 
+{% if user == post.author %}
+    <div class="mb-3">
+        <a href="{% url 'article:edit' slug=post.slug %}" class="btn btn-sm btn-outline-secondary">编辑文章</a>
+    </div>
+{% endif %}
+
 {% block content %}
     <article>
         <h1 class="mb-3">{{ post.title }}</h1>

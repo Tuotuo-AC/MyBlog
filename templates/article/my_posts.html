@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}我的文章 - 我的博客{% endblock %}
+
+{% block content %}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>我的文章</h2>
+        <a href="{% url 'article:create' %}" class="btn btn-primary">写新文章</a>
+    </div>
+
+    {% if page_obj %}
+        {% for post in page_obj %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{{ post.get_absolute_url }}" class="text-decoration-none">{{ post.title }}</a>
+                    </h5>
+                    <div class="post-meta">
+                        发布时间：{{ post.publish_time|date:"Y-m-d H:i" }} | 阅读量：{{ post.views }}
+                    </div>
+                    <div class="mt-2">
+                        <a href="{% url 'article:edit' slug=post.slug %}" class="btn btn-sm btn-outline-primary">编辑</a>
+                        <!-- 可以添加删除按钮（需要确认和权限） -->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">你还没有发布过文章。<a href="{% url 'article:create' %}">立即发布</a></div>
+    {% endif %}
+
+    <!-- 分页 -->
+    {% if page_obj.has_other_pages %}
+    <nav>
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">« 首页</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">上一页</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">第 {{ page_obj.number }} / {{ page_obj.paginator.num_pages }} 页</span></li>
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">下一页</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">末页 »</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+{% endblock %}

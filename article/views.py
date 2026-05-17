@@ -1,8 +1,9 @@
 # ListView用于展示对象列表（如文章列表页），DetailView用于展示单个对象详情（如文章详情页）
+from django.core.paginator import Paginator
 from django.views.generic import ListView,DetailView
 from django.shortcuts import get_object_or_404 # 根据条件获取对象，找不到则自动返回 404 页面
 from .models import Post
-
+from django.utils.text import slugify
 
 # 列表视图
 class PostListView(ListView):
@@ -84,7 +85,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.utils import timezone
 from .forms import PostForm
-from .models import Post, Tag
+from .models import Tag
 import time
 
 # 只有登录用户可访问
@@ -122,6 +123,49 @@ def create_post(request):
         form = PostForm()
     return render(request, 'article/create.html', {'form': form})
 
+from django.contrib.auth.decorators import login_required
+from .forms import PostForm
+
+@login_required
+def edit_post(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    # 权限检查：只能编辑自己的文章
+    if post.author != request.user:
+        return redirect('article:detail', slug=post.slug)  # 或者返回 403 页面
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES, instance=post)
+        if form.is_valid():
+            updated_post = form.save(commit=False)
+            # 如果标题修改了，需要重新生成 slug（可选）
+            if updated_post.title != post.title:
+                base_slug = slugify(updated_post.title)
+                if not base_slug:
+                    base_slug = f"post-{int(time.time())}"
+                new_slug = base_slug
+                counter = 1
+                while Post.objects.filter(slug=new_slug).exclude(pk=post.pk).exists():
+                    new_slug = f"{base_slug}-{counter}"
+                    counter += 1
+                updated_post.slug = new_slug
+            updated_post.save()
+            # 处理标签（如果有表单字段）
+            tags = form.cleaned_data.get('tags', [])
+            if tags:
+                updated_post.tags.clear()
+                for tag_name in tags:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name, slug=slugify(tag_name))
+                    updated_post.tags.add(tag)
+            return redirect('article:detail', slug=updated_post.slug)
+    else:
+        form = PostForm(instance=post)
+    return render(request, 'article/edit.html', {'form': form, 'post': post})
 
 
+@login_required
+def my_posts(request):
+    posts_list = Post.objects.filter(author=request.user).order_by('-publish_time')
+    paginator = Paginator(posts_list, 10) # 每页10篇
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'article/my_posts.html',{'page_obj':page_obj})
 
