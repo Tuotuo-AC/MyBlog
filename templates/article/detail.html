@@ -1,15 +1,17 @@
 {% extends 'base.html' %}
-
+{% load mptt_tags %} {# 1. 加载 mptt_tags 库 #}
 {% block title %}{{ post.title }}{% endblock %}
 
-{% if user == post.author %}
+
+
+{% block content %}
+    {# 将编辑/删除按钮移入{% block content %}内部 #}
+    {% if user == post.author %}
     <div class="mb-3">
         <a href="{% url 'article:edit' slug=post.slug %}" class="btn btn-sm btn-outline-secondary">编辑文章</a>
          <a href="{% url 'article:delete' post.slug %}" class="btn btn-outline-danger btn-sm">删除</a>
     </div>
-{% endif %}
-
-{% block content %}
+    {% endif %}
     <article>
         <h1 class="mb-3">{{ post.title }}</h1>
         <div class="post-meta mb-4">
@@ -34,25 +36,74 @@
         </div>
     </article>
     <hr>
-<h3>评论</h3>
-{% if user.is_authenticated %}
-    <form method="post" class="mb-4">
-        {% csrf_token %}
-        {{ comment_form.as_p }}
-        <button type="submit" class="btn btn-primary">发表评论</button>
-    </form>
-{% else %}
-    <p>请<a href="{% url 'login' %}?next={{ request.path }}">登录</a>后评论。</p>
-{% endif %}
+    <h3>评论</h3>
+    {# 评论表单 #}
+    {% if user.is_authenticated %}
+        <form method="post" class="mb-4" id="comment-form">
+            {% csrf_token %}
+            {{ comment_form.as_p }}
+            <input type="hidden" name="parent_id" id="parent-id-field" value="">
+            <button type="submit" class="btn btn-primary">发表评论</button>
+        </form>
+    {% else %}
+        <p>请<a href="{% url 'login' %}?next={{ request.path }}">登录</a>后评论。</p>
+    {% endif %}
 
-{% for comment in comments %}
-    <div class="card mb-2">
-        <div class="card-body">
-            <strong>{{ comment.author.username }}</strong> <small class="text-muted">{{ comment.created|date:"Y-m-d H:i" }}</small>
-            <p>{{ comment.content }}</p>
+    {# 评论列表 #}
+    {% recursetree comments %} {# 2. 使用 recursetree 标签处理评论列表 #}
+        <div class="comment" id="comment-{{ node.id }}" style="margin-left: {{ node.get_level }}em;">
+            <div class="card mt-3">
+                <div class="card-body">
+                    <strong>{{ node.author.username }}</strong>
+                    <small class="text-muted">
+                        {% if node.reply_to %}
+                            ｜ 回复 <strong>{{ node.reply_to.username }}</strong>
+                        {% endif %}
+                         ｜ {{ node.created|date:"Y-m-d H:i" }}
+                    </small>
+                    <p class="mb-1 mt-2">{{ node.content }}</p>
+                    <button class="btn btn-sm btn-link reply-btn" data-comment-id="{{ node.id }}">回复</button>
+                </div>
+            </div>
+            {# 3. 渲染子评论（回复） #}
+            {% if not node.is_leaf_node %}
+                <div class="children" style="margin-left: 1.5rem;">
+                    {{ children }}
+                </div>
+            {% endif %}
         </div>
-    </div>
-{% empty %}
-    <p>暂无评论，快来抢沙发吧！</p>
-{% endfor %}
+    {% endrecursetree %}
+{% endblock %}
+
+{# 添加JavaScript 处理回复按钮点击事件#}
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 使用事件委托，因为评论是动态生成的
+        document.addEventListener('click', function(e) {
+            const btn = e.target.closest('.reply-btn');
+            if (!btn) return;
+            
+            e.preventDefault();
+            
+            const commentId = btn.getAttribute('data-comment-id');
+            const parentIdField = document.getElementById('parent-id-field');
+            const commentForm = document.getElementById('comment-form');
+            
+            if (parentIdField && commentForm) {
+                parentIdField.value = commentId;
+                // 滚动到评论表单
+                commentForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 聚焦到文本框
+                const textarea = commentForm.querySelector('textarea');
+                if (textarea) {
+                    textarea.focus();
+                }
+                console.log('回复评论 ID:', commentId);
+            } else {
+                console.error('找不到表单元素:', { parentIdField, commentForm });
+            }
+        });
+    });
+</script>
 {% endblock %}

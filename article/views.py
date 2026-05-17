@@ -4,6 +4,8 @@ from django.views.generic import ListView,DetailView
 from django.shortcuts import get_object_or_404 # 根据条件获取对象，找不到则自动返回 404 页面
 from .models import Post
 from django.utils.text import slugify
+from comment.models import Comment
+from comment.forms import CommentForm
 
 # 列表视图
 class PostListView(ListView):
@@ -40,13 +42,13 @@ class PostDetailView(LoginRequiredMixin, DetailView):
         obj.save(update_fields=['views']) # 只更新这个字段
         return obj
 
-    # 将评论表单和顶级评论列表传递给模板供渲染
+    # 将评论表单和评论列表传递给模板供渲染
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['content_html'] = self.object.content  # ckeditor 输出已是 HTML
         context['comment_form'] = CommentForm()
-        # 获取顶级评论（parent 为 None）
-        context['comments'] = self.object.comments.filter(parent=None)
+        # 获取所有评论，使用 recursetree 标签自动处理树形结构
+        context['comments'] = self.object.comments.all()
         return context
 
     # 处理表单提交:验证、保存评论、关联文章和当前用户，支持嵌套评论（通过parent_id)
@@ -57,17 +59,31 @@ class PostDetailView(LoginRequiredMixin, DetailView):
             comment = form.save(commit=False)
             comment.post = self.object
             comment.author = request.user
+
+            # 处理回复逻辑
             # 如果有 parent_id 参数，说明是回复评论
             parent_id = request.POST.get('parent_id')
             if parent_id:
-                comment.parent_id = parent_id
+                try:
+                    parent_comment = Comment.objects.get(id=parent_id)
+                    comment.parent = parent_comment
+                    # 关键：设置 reply_to 为被回复的用户
+                    comment.reply_to = parent_comment.author
+                except Comment.DoesNotExist:
+                    pass
+            else:
+                comment.parent = None
+                comment.reply_to = None
+
             comment.save()
             return redirect(self.object.get_absolute_url())
-        # 表单验证失败时重新渲染页面并显示错误
-        return self.render_to_response(self.get_context_data(comment_form=form))
+        else:
+            # 表单验证失败时重新渲染页面并显示错误
+            return self.render_to_response(self.get_context_data(comment_form=form))
 
 from django.db.models import Q
 from django.shortcuts import render
+
 # 搜索视图
 def search(request):
     query = request.GET.get('q')

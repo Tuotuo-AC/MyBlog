@@ -22,7 +22,15 @@ class Comment(MPTTModel):
     created = models.DateTimeField(auto_now_add=True)
     # 用于嵌套，指向父评论。如果一条评论是回复另一条评论，parent 就指向被回复的那条评论；如果是顶级评论（直接回复文章），则 parent = None。
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
-
+    # 添加reply_to字段用于记录被回复的用户
+    reply_to = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='replyers',
+        verbose_name='回复给'
+    )
     class MPTTMeta:
         order_insertion_by = ['created']
 
