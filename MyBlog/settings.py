@@ -172,7 +172,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/'      # 登录后跳转到首页
 LOGOUT_REDIRECT_URL = '/'     # 登出后跳转到首页
-
+LOGOUT_REDIRECT_URL = '/'   # 登出后跳转到首页
 
 
 
