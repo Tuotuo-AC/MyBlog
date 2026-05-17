@@ -10,6 +10,7 @@ urlpatterns = [
     path('create/', views.create_post, name='create'),
     path('edit/<slug:slug>/', views.edit_post, name='edit'),
     path('my_posts/',views.my_posts,name='my_posts'),
+    path('delete/<slug:slug>/', views.delete_post, name='delete'),
     path('<slug:slug>/', PostDetailView.as_view(), name='detail'),
 ]
 

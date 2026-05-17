@@ -20,7 +20,8 @@
                     </div>
                     <div class="mt-2">
                         <a href="{% url 'article:edit' slug=post.slug %}" class="btn btn-sm btn-outline-primary">编辑</a>
-                        <!-- 可以添加删除按钮（需要确认和权限） -->
+                        <a href="{% url 'article:delete' post.slug %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要删除这篇文章吗？');">删除</a>
+                        {# 直接链接到删除确认页面（推荐），可改为：<a href="{% url 'article:delete' post.slug %}" class="btn btn-sm btn-outline-danger">删除</a> #}
                     </div>
                 </div>
             </div>

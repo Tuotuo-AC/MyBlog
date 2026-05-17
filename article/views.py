@@ -169,3 +169,25 @@ def my_posts(request):
     page_obj = paginator.get_page(page_number)
     return render(request, 'article/my_posts.html',{'page_obj':page_obj})
 
+
+from django.contrib import messages
+@login_required
+# 删除功能通常需要俩个步骤：显示确认删除页面（GET请求）和实际执行删除（POST请求）
+def delete_post(request, slug):
+    # 通过slug获取文章，检查作者是否为当前用户，否则拒绝并提示
+    post = get_object_or_404(Post, slug=slug)
+    # 检查权限，只有作者可以删除
+    if post.author != request.user:
+        messages.error(request,'您没有权限可以删除此文章')
+        return redirect('article:detail', slug=post.slug)
+
+    # 执行删除，成功后通过messages框架显示提示，并重定向到我的文章列表
+    if request.method == 'POST':
+        # 确认删除
+        post_title = post.title
+        post.delete()
+        messages.success(request,f'文章《{post_title}》已成功删除。')
+        return redirect('article:my_posts')
+
+    # GET请求时渲染确认删除模板
+    return render(request,'article/confirm_delete.html',{'post':post})
