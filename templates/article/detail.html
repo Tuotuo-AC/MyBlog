@@ -2,7 +2,241 @@
 {% load mptt_tags %} {# 1. 加载 mptt_tags 库 #}
 {% block title %}{{ post.title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+/* 评论区域样式 */
+.comments-section {
+    margin-top: 2rem;
+}
 
+.comment-count {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* 评论卡片样式 */
+.comment-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: none;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.comment-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.comment-card .card-body {
+    padding: 1rem 1.25rem;
+}
+
+/* 用户信息区域 */
+.comment-author {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.author-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0062E6, #33AEFF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.author-name {
+    font-weight: 600;
+    color: #212529;
+    font-size: 0.95rem;
+}
+
+.comment-meta {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-top: -0.25rem;
+}
+
+.reply-to {
+    color: #0062E6;
+    font-weight: 500;
+}
+
+/* 评论内容 */
+.comment-content {
+    color: #495057;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+}
+
+/* 操作按钮 */
+.comment-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.reply-btn {
+    color: #6c757d;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.reply-btn:hover {
+    color: #0062E6;
+    background: rgba(0, 98, 230, 0.08);
+    text-decoration: none;
+}
+
+/* 嵌套评论连接线 */
+.comment-tree {
+    position: relative;
+}
+
+.comment-level-1 {
+    padding-left: 0;
+}
+
+.comment-level-2 {
+    padding-left: 2rem;
+    position: relative;
+}
+
+.comment-level-2::before {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #e9ecef, transparent);
+}
+
+.comment-level-3 {
+    padding-left: 4rem;
+    position: relative;
+}
+
+.comment-level-3::before {
+    content: '';
+    position: absolute;
+    left: 3rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #dee2e6, transparent);
+}
+
+.comment-level-4,
+.comment-level-5,
+.comment-level-6 {
+    padding-left: 5rem;
+}
+
+/* 评论表单样式 */
+#comment-form {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#comment-form textarea {
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    resize: vertical;
+    min-height: 100px;
+    font-size: 0.95rem;
+}
+
+#comment-form textarea:focus {
+    border-color: #0062E6;
+    box-shadow: 0 0 0 3px rgba(0, 98, 230, 0.1);
+}
+
+/* 无评论时的提示 */
+.no-comments {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+}
+
+.no-comments-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* 展开/折叠按钮 */
+.toggle-btn {
+    color: #6c757d;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.toggle-btn:hover {
+    color: #0062E6;
+    background: rgba(0, 98, 230, 0.08);
+    text-decoration: none;
+}
+
+.toggle-btn i {
+    transition: transform 0.2s ease;
+}
+
+.toggle-btn.collapsed i {
+    transform: rotate(-90deg);
+}
+
+/* 子评论区域 */
+.children {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.children.collapsed {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.children.expanded {
+    max-height: 2000px;
+    opacity: 1;
+}
+
+/* 子评论计数 */
+.child-count {
+    font-size: 0.75rem;
+    color: #6c757d;
+    background: #f8f9fa;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+}
+</style>
+{% endblock %}
 
 {% block content %}
     {# 将编辑/删除按钮移入{% block content %}内部 #}
@@ -36,72 +270,157 @@
         </div>
     </article>
     <hr>
-    <h3>评论</h3>
-    {# 评论表单 #}
-    {% if user.is_authenticated %}
-        <form method="post" class="mb-4" id="comment-form">
-            {% csrf_token %}
-            {{ comment_form.as_p }}
-            <input type="hidden" name="parent_id" id="parent-id-field" value="">
-            <button type="submit" class="btn btn-primary">发表评论</button>
-        </form>
-    {% else %}
-        <p>请<a href="{% url 'login' %}?next={{ request.path }}">登录</a>后评论。</p>
-    {% endif %}
-
-    {# 评论列表 #}
-    {% recursetree comments %} {# 2. 使用 recursetree 标签处理评论列表 #}
-        <div class="comment" id="comment-{{ node.id }}" style="margin-left: {{ node.get_level }}em;">
-            <div class="card mt-3">
-                <div class="card-body">
-                    <strong>{{ node.author.username }}</strong>
-                    <small class="text-muted">
-                        {% if node.reply_to %}
-                            ｜ 回复 <strong>{{ node.reply_to.username }}</strong>
-                        {% endif %}
-                         ｜ {{ node.created|date:"Y-m-d H:i" }}
-                    </small>
-                    <p class="mb-1 mt-2">{{ node.content }}</p>
-                    <button class="btn btn-sm btn-link reply-btn" data-comment-id="{{ node.id }}">回复</button>
-                </div>
-            </div>
-            {# 3. 渲染子评论（回复） #}
-            {% if not node.is_leaf_node %}
-                <div class="children" style="margin-left: 1.5rem;">
-                    {{ children }}
-                </div>
-            {% endif %}
+    
+    <!-- 评论区域 -->
+    <div class="comments-section">
+        <div class="comment-count">
+            <i class="fas fa-comments mr-2"></i>
+            评论 ({{ comments|length }})
         </div>
-    {% endrecursetree %}
+
+        {# 评论表单 #}
+        {% if user.is_authenticated %}
+            <form method="post" class="mb-4" id="comment-form">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <input type="hidden" name="parent_id" id="parent-id-field" value="">
+                <button type="submit" class="btn btn-primary mt-2">发表评论</button>
+            </form>
+        {% else %}
+            <p class="text-muted mb-4">请<a href="{% url 'login' %}?next={{ request.path }}">登录</a>后评论。</p>
+        {% endif %}
+
+        {# 评论列表 #}
+        {% if comments %}
+            <div class="comment-tree">
+                {% recursetree comments %}
+                    <div 
+                        class="comment comment-level-{{ node.get_level|add:"1" }}" 
+                        id="comment-{{ node.id }}"
+                    >
+                        <div class="card comment-card">
+                            <div class="card-body">
+                                <!-- 用户信息 -->
+                                <div class="comment-author">
+                                    <div class="author-avatar">
+                                        {{ node.author.username|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="author-name">{{ node.author.username }}</div>
+                                        <div class="comment-meta">
+                                            {% if node.reply_to %}
+                                                <span class="reply-to">回复 {{ node.reply_to.username }}</span>
+                                            {% endif %}
+                                            <span class="ml-2">{{ node.created|date:"Y-m-d H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- 评论内容 -->
+                                <p class="comment-content">{{ node.content }}</p>
+                                
+                                <!-- 操作按钮 -->
+                                <div class="comment-actions">
+                                    <button 
+                                        class="btn btn-sm reply-btn" 
+                                        data-comment-id="{{ node.id }}"
+                                    >
+                                        <i class="fas fa-reply mr-1"></i>
+                                        回复
+                                    </button>
+                                    {% if not node.is_leaf_node %}
+                                        <button 
+                                            class="btn btn-sm toggle-btn expanded" 
+                                            data-comment-id="{{ node.id }}"
+                                            data-action="toggle"
+                                        >
+                                            <i class="fas fa-chevron-down mr-1"></i>
+                                            <span class="child-count">{{ node.get_descendant_count }} 回复</span>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 子评论 -->
+                        {% if not node.is_leaf_node %}
+                            <div class="children expanded" id="children-{{ node.id }}">
+                                {{ children }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endrecursetree %}
+            </div>
+        {% else %}
+            <div class="no-comments">
+                <div class="no-comments-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <p>暂无评论，快来发表第一条评论吧！</p>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
 
-{# 添加JavaScript 处理回复按钮点击事件#}
+{# 添加JavaScript 处理回复按钮和展开/折叠按钮点击事件#}
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // 使用事件委托，因为评论是动态生成的
         document.addEventListener('click', function(e) {
-            const btn = e.target.closest('.reply-btn');
-            if (!btn) return;
-            
-            e.preventDefault();
-            
-            const commentId = btn.getAttribute('data-comment-id');
-            const parentIdField = document.getElementById('parent-id-field');
-            const commentForm = document.getElementById('comment-form');
-            
-            if (parentIdField && commentForm) {
-                parentIdField.value = commentId;
-                // 滚动到评论表单
-                commentForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                // 聚焦到文本框
-                const textarea = commentForm.querySelector('textarea');
-                if (textarea) {
-                    textarea.focus();
+            // 处理回复按钮
+            const replyBtn = e.target.closest('.reply-btn');
+            if (replyBtn) {
+                e.preventDefault();
+                
+                const commentId = replyBtn.getAttribute('data-comment-id');
+                const parentIdField = document.getElementById('parent-id-field');
+                const commentForm = document.getElementById('comment-form');
+                
+                if (parentIdField && commentForm) {
+                    parentIdField.value = commentId;
+                    // 滚动到评论表单
+                    commentForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 聚焦到文本框
+                    const textarea = commentForm.querySelector('textarea');
+                    if (textarea) {
+                        textarea.focus();
+                    }
+                    console.log('回复评论 ID:', commentId);
+                } else {
+                    console.error('找不到表单元素:', { parentIdField, commentForm });
                 }
-                console.log('回复评论 ID:', commentId);
-            } else {
-                console.error('找不到表单元素:', { parentIdField, commentForm });
+                return;
+            }
+            
+            // 处理展开/折叠按钮
+            const toggleBtn = e.target.closest('.toggle-btn');
+            if (toggleBtn) {
+                e.preventDefault();
+                
+                const commentId = toggleBtn.getAttribute('data-comment-id');
+                const childrenContainer = document.getElementById('children-' + commentId);
+                
+                if (childrenContainer) {
+                    // 切换展开/折叠状态
+                    if (toggleBtn.classList.contains('expanded')) {
+                        // 折叠
+                        toggleBtn.classList.remove('expanded');
+                        toggleBtn.classList.add('collapsed');
+                        childrenContainer.classList.remove('expanded');
+                        childrenContainer.classList.add('collapsed');
+                    } else {
+                        // 展开
+                        toggleBtn.classList.remove('collapsed');
+                        toggleBtn.classList.add('expanded');
+                        childrenContainer.classList.remove('collapsed');
+                        childrenContainer.classList.add('expanded');
+                    }
+                    console.log('切换子评论状态:', commentId, toggleBtn.classList.contains('expanded') ? '展开' : '折叠');
+                } else {
+                    console.error('找不到子评论容器:', 'children-' + commentId);
+                }
+                return;
             }
         });
     });
