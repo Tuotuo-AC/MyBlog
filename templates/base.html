@@ -97,12 +97,19 @@
                     {% if user.is_authenticated %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'article:my_posts' %}">我的文章</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'article:create' %}">发布文章</a></li>
+{#                        <li class="nav-item">#}
+{#                            <form action="{% url 'logout' %}" method="post" style="display: inline;">#}
+{#                                {% csrf_token %}#}
+{#                                <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 0; margin: 0; border: none; background: none; color: rgba(255,255,255,0.85);">登出</button>#}
+{#                            </form>#}
+{#                        </li>#}
+                        {# Button元素与a元素在浏览器默认样式上有差异，解决登出按钮偏上 #}
                         <li class="nav-item">
-                            <form action="{% url 'logout' %}" method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-link nav-link" style="display: inline; padding: 0; margin: 0; border: none; background: none; color: rgba(255,255,255,0.85);">登出</button>
-                            </form>
+                            <a class="nav-link" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">登出</a>
                         </li>
+                        <form id="logout-form" action="{% url 'logout' %}" method="post" style="display: none;">
+                            {% csrf_token %}
+                        </form>
                         {# <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">登出</a></li>#}
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">登录</a></li>

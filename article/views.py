@@ -11,10 +11,10 @@ from django.utils.decorators import method_decorator
 
 # 列表视图
 class PostListView(ListView):
-    # 在视图中使用缓存（首页列表）
-    @method_decorator(cache_page(60 * 15))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
+    # 在视图中使用缓存（首页列表） @method_decorator(cache_page(60 * 10)) 装饰器，这会导致页面被缓存 15 分钟，包括未登录状态的页面。
+    # @method_decorator(cache_page(60 * 10))
+    # def dispatch(self, *args, **kwargs):
+    #     return super().dispatch(*args, **kwargs)
 
     model = Post # 告诉ListView使用Post模型
     template_name = 'article/list.html' # 指定渲染模板路径
