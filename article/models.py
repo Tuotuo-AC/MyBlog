@@ -62,7 +62,7 @@ class Post(models.Model):
     )
 
     # 内容相关
-    summary = models.CharField(max_length=300, blank=True, verbose_name='摘要', help_text='可留空由AI生成')
+    summary = models.CharField(max_length=300, blank=True,null=True, verbose_name='摘要', help_text='可留空由AI生成')
     content = RichTextField(verbose_name='正文', config_name='default')
 
     # 发布状态与时间

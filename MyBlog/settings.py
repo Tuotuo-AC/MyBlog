@@ -17,7 +17,8 @@ from dotenv import load_dotenv
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY')
+DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -46,9 +47,10 @@ INSTALLED_APPS = [
     'ckeditor',
     'mptt',
     # 自定义应用
-    'article',
     'user',
     'comment',
+    # 'article', 与下面重复注册了，保留其确保信号模块被加载
+    'article.apps.ArticleConfig',   # 确保 ready() 被调用
 ]
 
 MIDDLEWARE = [

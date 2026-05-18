@@ -18,10 +18,10 @@
                     <div class="post-meta">
                         发布时间：{{ post.publish_time|date:"Y-m-d H:i" }} | 阅读量：{{ post.views }}
                     </div>
+                    <p class="card-text mt-2 text-muted">{% if post.summary %}{{ post.summary }}{% else %}{{ post.content|striptags|truncatechars:120 }}{% endif %}</p>
                     <div class="mt-2">
                         <a href="{% url 'article:edit' slug=post.slug %}" class="btn btn-sm btn-outline-primary">编辑</a>
                         <a href="{% url 'article:delete' post.slug %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('确定要删除这篇文章吗？');">删除</a>
-                        {# 直接链接到删除确认页面（推荐），可改为：<a href="{% url 'article:delete' post.slug %}" class="btn btn-sm btn-outline-danger">删除</a> #}
                     </div>
                 </div>
             </div>

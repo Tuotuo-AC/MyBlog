@@ -21,7 +21,7 @@
                     <i class="fas fa-calendar-alt ms-2"></i> {{ post.publish_time|date:"Y-m-d" }}
                     <i class="fas fa-eye ms-2"></i> {{ post.views }}
                 </div>
-                <p class="card-text">{{ post.summary|default:post.content|truncatechars:120|striptags }}</p>
+                <p class="card-text">{% if post.summary %}{{ post.summary }}{% else %}{{ post.content|striptags|truncatechars:120 }}{% endif %}</p>
                 <a href="{{ post.get_absolute_url }}" class="btn btn-outline-primary btn-sm">阅读全文 →</a>
             </div>
         </div>

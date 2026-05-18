@@ -254,6 +254,15 @@
             发布时间：{{ post.publish_time|date:"Y-m-d H:i" }} |
             阅读量：{{ post.views }}
         </div>
+
+        {# 新增：显示摘要（如果有） #}
+        {% if post.summary %}
+            <div class="post-summary alert alert-secondary" role="alert" style="background-color: #f8f9fa; border-left: 4px solid #0062E6;">
+                <strong>📖 文章摘要</strong><br>
+                {{ post.summary }}
+            </div>
+        {% endif %}
+
         <div class="post-content">
             {{ content_html|safe }}
         </div>
