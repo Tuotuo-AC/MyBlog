@@ -191,4 +191,4 @@ LOGOUT_REDIRECT_URL = '/'     # 登出后跳转到首页
 LOGOUT_REDIRECT_URL = '/'   # 登出后跳转到首页
 
 
-
+SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
